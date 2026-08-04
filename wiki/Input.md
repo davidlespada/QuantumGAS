@@ -95,7 +95,7 @@ Move and Look are native. Sprint is an ability input.
 
 1. Create an Input Action and add it to the mapping context.
 2. Add it under **Native Input Actions** in the input config with a tag.
-3. Declare the tag if needed (see [Gameplay Tags](Gameplay-Tags)).
+3. Declare the tag if needed (see [Gameplay Tags](Gameplay-Tags.md)).
 4. In `SetupPlayerInputComponent`, call `BindNativeAction` with that tag and your function.
 
 ```cpp
@@ -119,6 +119,6 @@ No extra bind call is needed on the character if `BindAbilityActions` is already
 
 Ability input is not activated only in the press callback. The ASC queues pressed/released handles, then `AQuantumPlayerController::PostProcessInput` calls `ProcessAbilityInput` each frame.
 
-That supports both one-shot and hold-to-activate abilities. See [Abilities](Abilities).
+That supports both one-shot and hold-to-activate abilities. See [Abilities](Abilities.md).
 
 Native input does not use this path; it runs the bound function when Enhanced Input fires.
