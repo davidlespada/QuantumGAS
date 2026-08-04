@@ -75,7 +75,7 @@ Enhanced Input (press / release)
   → TryActivateAbility / AbilitySpecInputReleased
 ```
 
-See [Input](Input) for the full native vs ability breakdown.
+See [Input](Input.md) for the full native vs ability breakdown.
 
 ---
 
