@@ -108,5 +108,5 @@ Content path: `GA_Sprint` + `GE_SprintSpeed`.
 Typical setup for a hold ability:
 
 - Activation policy: `WhileInputActive`
-- Input tag: `Input.Sprint` (see [Gameplay Tags](Gameplay-Tags))
+- Input tag: `Input.Sprint` (see [Gameplay Tags](Gameplay-Tags.md))
 - Granted through `DA_PlayerAbilitySet`
