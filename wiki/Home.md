@@ -10,12 +10,12 @@ The goal is to save some of the boilerplate needed to set up GAS, and to provide
 
 | Topic | Page |
 | --- | --- |
-| Install and basic setup | [Getting Started](Getting-Started) |
-| How the classes fit together | [Architecture](Architecture) |
-| Enhanced Input binding | [Input](Input) |
-| Abilities and ability sets | [Abilities](Abilities) |
-| Health, speed, and attributes | [Attributes](Attributes) |
-| Native gameplay tags | [Gameplay Tags](Gameplay-Tags) |
+| Install and basic setup | [Getting Started](Getting-Started.md) |
+| How the classes fit together | [Architecture](Architecture.md) |
+| Enhanced Input binding | [Input](Input.md) |
+| Abilities and ability sets | [Abilities](Abilities.md) |
+| Health, speed, and attributes | [Attributes](Attributes.md) |
+| Native gameplay tags | [Gameplay Tags](Gameplay-Tags.md) |
 
 ---
 
