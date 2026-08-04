@@ -1,0 +1,91 @@
+# Unreal Engine - Generated / Build artifacts
+Binaries/
+Intermediate/
+DerivedDataCache/
+Saved/
+
+# Unreal Engine - Build files that should not be committed
+*.modules
+*.target
+*.suppressed
+
+# Compiled Object files
+*.o
+*.obj
+*.lo
+*.slo
+*.gch
+*.pch
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exp
+*.pdb
+
+# Visual Studio
+.vs/
+*.VC.db
+*.VC.opendb
+*.sln
+*.suo
+*.sdf
+*.opensdf
+*.VC.opendb
+*.VC.db-wal
+*.VC.db-shm
+*Generated.h
+*Generated.cpp
+*.aps
+*.ncb
+*.opendb
+*.opendb-shm
+*.opendb-wal
+*.vcxproj.filters
+*.VC.VC.opendb
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains Rider
+.idea/
+*.iml
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+DerivedData/
+*.hmap
+*.ipa
+*.xcuserstate
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+*.*~
+
+# Don't ignore the plugin descriptor and core folders, but ensure we don't accidentally ignore content
+# Keep these explicitly (safety for global gitignore rules)
+!*.uplugin
+!Config/
+!Content/
+!Resources/
+!Source/
