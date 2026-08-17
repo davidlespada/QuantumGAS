@@ -20,9 +20,10 @@ The goal of this plugin is to save some of the boilerplate needed to set up GAS,
 
 ## Install
 
-1. Copy the folder into `YourProject/Plugins/QuantumGAS`
-2. Open the project and rebuild if prompted
-3. Enable the plugin if needed (`Edit → Plugins`)
+1. (For GitHub) This uses Git LFS. Make sure to have it installed. Do not click "Download ZIP". Do the usual git clone for LFS to work. 
+2. Copy the folder into `YourProject/Plugins/QuantumGAS`
+3. Open the project and rebuild if prompted
+4. Enable the plugin if needed (`Edit → Plugins`)
 
 ---
 
