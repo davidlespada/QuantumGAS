@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "Quantum GAS",
+	"FriendlyName": "GAS Quick Setup",
 	"Description": "Composable first-person Gameplay Ability System framework with Enhanced Input, attributes, ability sets, and ready-to-use character/controller/player-state scaffolding.",
 	"Category": "Gameplay",
 	"CreatedBy": "David L. Espada",
