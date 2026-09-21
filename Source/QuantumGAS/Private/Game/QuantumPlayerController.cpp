@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 
 #include "Game/QuantumPlayerController.h"
@@ -11,11 +11,18 @@
 void AQuantumPlayerController::AcknowledgePossession(class APawn* P)
 {
 	Super::AcknowledgePossession(P);
-	
+
+	// The ASC lives on the PlayerState (Mixed replication mode), so OwnerActor must be
+	// the PlayerState and AvatarActor the pawn. If PlayerState hasn't replicated yet,
+	// skip here — the character's OnRep_PlayerState will init once it arrives.
+	AQuantumPlayerState* PS = GetPlayerState<AQuantumPlayerState>();
 	AQuantumCharacter* QuantumCharacter = Cast<AQuantumCharacter>(P);
-	if (IsValid(QuantumCharacter))
+	if (IsValid(PS) && IsValid(QuantumCharacter))
 	{
-		QuantumCharacter->GetAbilitySystemComponent()->InitAbilityActorInfo(QuantumCharacter, QuantumCharacter);
+		if (UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent())
+		{
+			ASC->InitAbilityActorInfo(PS, QuantumCharacter);
+		}
 	}
 }
 
@@ -31,6 +38,13 @@ void AQuantumPlayerController::PostProcessInput(const float DeltaTime, const boo
 
 UQuantumASC* AQuantumPlayerController::GetQuantumASC() const
 {
-	const AQuantumPlayerState* PS = CastChecked<AQuantumPlayerState>(PlayerState, ECastCheckedType::NullAllowed);
-	return CastChecked<UQuantumASC>(PS->GetAbilitySystemComponent());
+	// PlayerState can be null (e.g. before replication/possession, during login/travel,
+	// or for a second player joining a listen server). The caller expects a nullable
+	// result, so use soft casts and return nullptr instead of checking/crashing.
+	const AQuantumPlayerState* PS = GetPlayerState<AQuantumPlayerState>();
+	if (!IsValid(PS))
+	{
+		return nullptr;
+	}
+	return Cast<UQuantumASC>(PS->GetAbilitySystemComponent());
 }

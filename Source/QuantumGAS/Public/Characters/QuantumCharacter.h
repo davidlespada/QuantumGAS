@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 #pragma once
 
@@ -11,7 +11,7 @@
 class UQuantumAttributeSet;
 class UQuantumASC;
 
-UCLASS()
+UCLASS(meta = (PrioritizeCategories = "Ability&Input"))
 class QUANTUMGAS_API AQuantumCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
@@ -25,6 +25,8 @@ protected:
 	
 	FDelegateHandle MoveSpeedChangedDelegateHandle;
 	virtual void MoveSpeedChanged(const FOnAttributeChangeData& Data);
+	virtual void BindMoveSpeedListener();
+	virtual void ApplyInitialMoveSpeed();
 
 
 public:
@@ -40,8 +42,8 @@ public:
 	
 	// Default attributes for a character for initializing on spawn/respawn.
 	// This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GASDocumentation|Abilities")
-	TSubclassOf<class UGameplayEffect> DefaultAttributes;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability&Input")
+	TArray<TSubclassOf<class UGameplayEffect>> DefaultAttributes;
 	
 	/**
 	 * Getters for attributes

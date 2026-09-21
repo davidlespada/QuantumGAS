@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 #pragma once
 
@@ -17,13 +17,13 @@ struct FQuantumAbilitySet_GameplayAbility
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TSubclassOf<UQuantumGameplayAbilityBase> GameplayAbility;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	int32 AbilityLevel = 1;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayTag InputTag;
 };
 

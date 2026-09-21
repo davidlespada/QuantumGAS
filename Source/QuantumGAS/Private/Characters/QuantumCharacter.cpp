@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 
 #include "Characters/QuantumCharacter.h"
@@ -10,25 +10,40 @@
 
 void AQuantumCharacter::InitializeAttributes()
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	if (!QuantumASC.IsValid())
 	{
 		return;
 	}
 
-	if (!DefaultAttributes)
+	if (DefaultAttributes.IsEmpty())
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s() Missing DefaultAttributes for %s. Please fill in the character's Blueprint."), *FString(__FUNCTION__), *GetName());
 		return;
 	}
 
-	// Can run on Server and Client
+	// Default attributes are server-authoritative and replicate to clients
 	FGameplayEffectContextHandle EffectContext = QuantumASC->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle NewHandle = QuantumASC->MakeOutgoingSpec(DefaultAttributes, 1, EffectContext);
-	if (NewHandle.IsValid())
+	for (int32 Index = 0; Index < DefaultAttributes.Num(); ++Index)
 	{
-		FActiveGameplayEffectHandle ActiveGEHandle = QuantumASC->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), QuantumASC.Get());
+		TSubclassOf<UGameplayEffect> AttributesGE = DefaultAttributes[Index];
+		if (!AttributesGE)
+		{
+			UE_LOG(LogTemp, Error, TEXT("%s() DefaultAttributes[%d] is not valid for %s. Skipping."), *FString(__FUNCTION__), Index, *GetName());
+			continue;
+		}
+
+		FGameplayEffectSpecHandle NewHandle = QuantumASC->MakeOutgoingSpec(AttributesGE, 1, EffectContext);
+		if (NewHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle ActiveGEHandle = QuantumASC->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), QuantumASC.Get());
+		}
 	}
 }
 
@@ -43,16 +58,45 @@ void AQuantumCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (QuantumASC.IsValid())
+	BindMoveSpeedListener();
+	ApplyInitialMoveSpeed();
+}
+
+void AQuantumCharacter::BindMoveSpeedListener()
+{
+	if (!QuantumASC.IsValid() || !QuantumAttributeSet.IsValid())
 	{
-		MoveSpeedChangedDelegateHandle = QuantumASC->GetGameplayAttributeValueChangeDelegate(QuantumAttributeSet->GetMoveSpeedAttribute()).AddUObject(this, &ThisClass::MoveSpeedChanged);
+		return;
+	}
+
+	if (MoveSpeedChangedDelegateHandle.IsValid())
+	{
+		QuantumASC->GetGameplayAttributeValueChangeDelegate(QuantumAttributeSet->GetMoveSpeedAttribute()).Remove(MoveSpeedChangedDelegateHandle);
+		MoveSpeedChangedDelegateHandle.Reset();
+	}
+
+	MoveSpeedChangedDelegateHandle = QuantumASC->GetGameplayAttributeValueChangeDelegate(QuantumAttributeSet->GetMoveSpeedAttribute()).AddUObject(this, &ThisClass::MoveSpeedChanged);
+}
+
+void AQuantumCharacter::ApplyInitialMoveSpeed()
+{
+	if (!QuantumAttributeSet.IsValid())
+	{
+		return;
+	}
+
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->MaxWalkSpeed = QuantumAttributeSet->GetMoveSpeed();
 	}
 }
 
 void AQuantumCharacter::MoveSpeedChanged(const FOnAttributeChangeData& Data)
 {
-	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
-	MovementComponent->MaxWalkSpeed = Data.NewValue;
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->MaxWalkSpeed = Data.NewValue;
+	}
 }
 
 // Called every frame

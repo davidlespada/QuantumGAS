@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 
 #include "GAS/Attributes/QuantumAttributeSet.h"
@@ -10,6 +10,9 @@ void UQuantumAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UQuantumAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UQuantumAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UQuantumAttributeSet, HealthRegenRate, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UQuantumAttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
 }
 
 void UQuantumAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 
 #include "Characters/QuantumCharacterMovementComponent.h"
@@ -43,8 +43,7 @@ float UQuantumCharacterMovementComponent::GetMaxSpeed() const
 
 // Called every frame
 void UQuantumCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                       FActorComponentTickFunction* ThisTickFunction)
+                                                        FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
-

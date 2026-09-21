@@ -6,19 +6,21 @@
 	"Description": "Composable first-person Gameplay Ability System framework with Enhanced Input, attributes, ability sets, and ready-to-use character/controller/player-state scaffolding.",
 	"Category": "Gameplay",
 	"CreatedBy": "David L. Espada",
-	"CreatedByURL": "",
-	"DocsURL": "",
+	"CreatedByURL": "https://github.com/davidlespada",
+	"DocsURL": "https://github.com/davidlespada/QuantumGAS/wiki",
 	"MarketplaceURL": "",
-	"SupportURL": "",
+	"SupportURL": "https://github.com/davidlespada/QuantumGAS/issues",
+	"EngineVersion": "5.8.0",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
-	"IsExperimentalVersion": false,
-	"Installed": false,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "QuantumGAS",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64"
+			]
 		}
 	],
 	"Plugins": [

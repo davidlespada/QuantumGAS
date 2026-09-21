@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 #pragma once
 
@@ -13,7 +13,7 @@ class UInputMappingContext;
 class UQuantumInputConfig;
 class UQuantumAbilitySet;
 
-UCLASS()
+UCLASS(meta = (PrioritizeCategories = "Ability&Input"))
 class QUANTUMGAS_API AQuantumPlayerCharacter : public AQuantumCharacter
 {
 	GENERATED_BODY()
@@ -36,20 +36,20 @@ public:
 	void InputAbilityInputTagReleased(FGameplayTag InputTag);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability&Input")
-	TObjectPtr<UQuantumAbilitySet> AbilitySet;
+	TArray<TObjectPtr<UQuantumAbilitySet>> AbilitySets;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability&Input")
-	TObjectPtr<UQuantumInputConfig> InputConfig;
+	TArray<TObjectPtr<UQuantumInputConfig>> InputConfigs;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability&Input")
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-	
+	TArray<TObjectPtr<UInputMappingContext>> DefaultMappingContexts;
+
 protected:
 	UPROPERTY(Category=Character, VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> CameraComponent;
 	
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
+	virtual void Move(const FInputActionValue& Value);
+	virtual void Look(const FInputActionValue& Value);
 	
 private:
 	void SetDefaultMappingContext() const;

@@ -1,15 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (c) 2026 David L. Espada. All Rights Reserved.
 
 
 #include "Characters/QuantumPlayerCharacter.h"
 
 #include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
 #include "Game/QuantumPlayerController.h"
 #include "Game/QuantumPlayerState.h"
 #include "GAS/QuantumAbilitySet.h"
 #include "GAS/QuantumASC.h"
 #include "Input/QuantumInputComponent.h"
+#include "Engine/LocalPlayer.h"
 #include "Tags/QuantumAbilityTags.h"
 
 
@@ -18,10 +20,12 @@ AQuantumPlayerCharacter::AQuantumPlayerCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
+	// Base class owns the camera but deliberately leaves it unattached here;
+	// derived per-mode characters perform the one explicit attachment
+	// (FP mesh head socket, capsule for no-mesh, spring arm for third person).
+	// Note: a scene component without an explicit attachment auto-attaches to the RootComponent.
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(RootComponent);
-	CameraComponent->SetFieldOfView(80.0f);
 }
 
 // Called when the game starts or when spawned
@@ -39,15 +43,26 @@ void AQuantumPlayerCharacter::PossessedBy(AController* NewController)
 	if (IsValid(QuantumPlayerState))
 	{
 		QuantumASC = Cast<UQuantumASC>(QuantumPlayerState->GetAbilitySystemComponent());
-		QuantumPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(QuantumPlayerState, this);
-		QuantumAttributeSet = QuantumPlayerState->GetAttributeSet();
-		InitializeAttributes();
+		if (QuantumASC.IsValid())
+		{
+			QuantumASC->InitAbilityActorInfo(QuantumPlayerState, this);
+			QuantumAttributeSet = QuantumPlayerState->GetAttributeSet();
+			InitializeAttributes();
+			BindMoveSpeedListener();
+			ApplyInitialMoveSpeed();
+		}
 	}
 	SetOwner(NewController);
 	
-	if (IsValid(AbilitySet))
+	if (QuantumASC.IsValid())
 	{
-		AbilitySet->GiveToAbilitySystem(QuantumASC.Get(), nullptr, this);
+		for (const TObjectPtr<UQuantumAbilitySet>& AbilitySet : AbilitySets)
+		{
+			if (IsValid(AbilitySet))
+			{
+				AbilitySet->GiveToAbilitySystem(QuantumASC.Get(), nullptr, this);
+			}
+		}
 	}
 }
 
@@ -59,9 +74,14 @@ void AQuantumPlayerCharacter::OnRep_PlayerState()
 	if (IsValid(QuantumPlayerState))
 	{
 		QuantumASC = Cast<UQuantumASC>(QuantumPlayerState->GetAbilitySystemComponent());
-		QuantumASC->InitAbilityActorInfo(QuantumPlayerState, this);
+		if (QuantumASC.IsValid())
+		{
+			QuantumASC->InitAbilityActorInfo(QuantumPlayerState, this);
+			QuantumAttributeSet = QuantumPlayerState->GetAttributeSet();
+			BindMoveSpeedListener();
+			ApplyInitialMoveSpeed();
+		}
 	}
-	InitializeAttributes();
 }
 
 // Called every frame
@@ -81,24 +101,37 @@ void AQuantumPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	FGameplayTag NativeMoveTag = QuantumAbilityTags::Input_Move;
 	FGameplayTag NativeLookTag = QuantumAbilityTags::Input_Look;
 	
-	QuantumInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::InputAbilityInputTagPressed,
-	                                          &ThisClass::InputAbilityInputTagReleased, BindHandles);
+	for (const TObjectPtr<UQuantumInputConfig>& InputConfig : InputConfigs)
+	{
+		if (!IsValid(InputConfig))
+		{
+			continue;
+		}
+
+		QuantumInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::InputAbilityInputTagPressed,
+		                                          &ThisClass::InputAbilityInputTagReleased, BindHandles);
 	
-	
-	QuantumInputComponent->BindNativeAction(InputConfig, NativeMoveTag, ETriggerEvent::Triggered, this, &ThisClass::Move);
-	QuantumInputComponent->BindNativeAction(InputConfig, NativeLookTag, ETriggerEvent::Triggered, this, &ThisClass::Look);
+		QuantumInputComponent->BindNativeAction(InputConfig, NativeMoveTag, ETriggerEvent::Triggered, this, &ThisClass::Move);
+		QuantumInputComponent->BindNativeAction(InputConfig, NativeLookTag, ETriggerEvent::Triggered, this, &ThisClass::Look);
+	}
 	
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 void AQuantumPlayerCharacter::InputAbilityInputTagPressed(FGameplayTag InputTag)
 {
-	QuantumASC->AbilityInputTagPressed(InputTag);
+	if (QuantumASC.IsValid())
+	{
+		QuantumASC->AbilityInputTagPressed(InputTag);
+	}
 }
 
 void AQuantumPlayerCharacter::InputAbilityInputTagReleased(FGameplayTag InputTag)
 {
-	QuantumASC->AbilityInputTagReleased(InputTag);
+	if (QuantumASC.IsValid())
+	{
+		QuantumASC->AbilityInputTagReleased(InputTag);
+	}
 }
 
 void AQuantumPlayerCharacter::Move(const FInputActionValue& Value)
@@ -137,15 +170,22 @@ void AQuantumPlayerCharacter::Look(const FInputActionValue& Value)
 
 void AQuantumPlayerCharacter::SetDefaultMappingContext() const
 {
-	if (DefaultMappingContext)
+	if (DefaultMappingContexts.IsEmpty())
 	{
-		if (AQuantumPlayerController* PC = Cast<AQuantumPlayerController>(GetController()))
+		return;
+	}
+
+	if (AQuantumPlayerController* PC = Cast<AQuantumPlayerController>(GetController()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
-			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+			for (int32 Index = 0; Index < DefaultMappingContexts.Num(); ++Index)
 			{
-				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+				if (IsValid(DefaultMappingContexts[Index].Get()))
+				{
+					Subsystem->AddMappingContext(DefaultMappingContexts[Index], Index);
+				}
 			}
 		}
 	}
 }
-
